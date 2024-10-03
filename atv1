@@ -1,0 +1,44 @@
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        // Entradas
+        double[] capitais = { 1000, 5500, 12000 };
+        double[] taxas = { 0.03, 0.0248, 0.02 };
+        int meses = 8;
+        double dias = 10;
+
+        // Tabela de resultados
+        Console.WriteLine("\n| Investimento | Capital Inicial | Taxa de Juros | Rendimento Mensal | Capital Final Mensal |");
+        Console.WriteLine("|--------------|----------------|----------------|--------------------|---------------------|");
+
+        for (int i = 0; i < capitais.Length; i++)
+        {
+            double capitalInicial = capitais[i];
+            double taxaJuros = taxas[i];
+            double capitalAtual = capitalInicial;
+            double totalRendimento = 0;
+
+            for (int mes = 1; mes <= meses; mes++)
+            {
+                // Cálculo do rendimento mensal
+                double rendimentoMensal = capitalAtual * taxaJuros;
+                capitalAtual += rendimentoMensal; // Atualiza o capital com o rendimento
+                totalRendimento += rendimentoMensal; // Acumula o rendimento total
+
+                // Exibindo os resultados mensais
+                Console.WriteLine($"| Investimento {i + 1} | {capitalAtual - rendimentoMensal,14:F2} | {taxaJuros * 100,12:F2}% | {rendimentoMensal,18:F2} | {capitalAtual,20:F2} |");
+            }
+
+            // Cálculo do rendimento para os 10 dias
+            double taxaDiaria = taxaJuros / 30; // Aproximando a taxa diária
+            double rendimentoDias = capitalAtual * taxaDiaria * dias;
+            capitalAtual += rendimentoDias; // Atualiza o capital com o rendimento dos 10 dias
+            totalRendimento += rendimentoDias; // Acumula o rendimento total
+
+            // Exibindo o resultado final
+            Console.WriteLine($"| Total Investimento {i + 1} | {capitalAtual - totalRendimento,14:F2} | {taxaJuros * 100,12:F2}% | {totalRendimento,18:F2} | {capitalAtual,20:F2} |");
+
+            Console.ReadLine();
