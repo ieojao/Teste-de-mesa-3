@@ -1,44 +1,85 @@
 using System;
+using System.Collections.Generic;
+
+class Investimento
+{
+    public double CapitalInicial { get; set; }
+    public double TaxaJuros { get; set; }
+    public int Meses { get; set; }
+
+    public Investimento(double capitalInicial, double taxaJuros, int meses)
+    {
+        CapitalInicial = capitalInicial;
+        TaxaJuros = taxaJuros / 100;
+        Meses = meses;
+    }
+
+    public void CalcularRendimentos(int dias)
+    {
+        double capitalAtual = CapitalInicial;
+        double totalRendimento = 0;
+        Console.WriteLine(" --------------- Tabela de investimentos --------------- ");
+        Console.WriteLine("\n| Mês | Capital Inicial | Rendimento Mensal | Capital Final |");
+
+        for (int mes = 1; mes <= Meses; mes++)
+        {
+            double rendimentoMensal = capitalAtual * TaxaJuros; // Rendimento mensal
+            capitalAtual += rendimentoMensal; // Atualiza o capital com o rendimento
+
+            Console.WriteLine($"| {mes,3} | {capitalAtual - rendimentoMensal,14:F2} | {rendimentoMensal,18:F2} | {capitalAtual,14:F2} |");
+
+            totalRendimento += rendimentoMensal;
+        }
+
+        // Cálculo para os dias finais
+        double taxaDiaria = TaxaJuros / 30; // Aproximando a taxa diária
+        double rendimentoDias = capitalAtual * taxaDiaria * dias;
+        capitalAtual += rendimentoDias; // Atualiza o capital com o rendimento dos dias
+        totalRendimento += rendimentoDias; // Acumula o rendimento total
+
+        Console.WriteLine($"| Total | {CapitalInicial,14:F2} | {totalRendimento,18:F2} | {capitalAtual,14:F2} |");
+    }
+}
 
 class Program
 {
     static void Main()
     {
-        // Entradas
-        double[] capitais = { 1000, 5500, 12000 };
-        double[] taxas = { 0.03, 0.0248, 0.02 };
-        int meses = 8;
-        double dias = 10;
+        List<Investimento> investimentos = new List<Investimento>();
+        const int meses = 8; // Definido como 8 meses para todos os investimentos
+        const int dias = 10; // Definido como 10 dias para todos os investimentos
 
-        // Tabela de resultados
-        Console.WriteLine("\n| Investimento | Capital Inicial | Taxa de Juros | Rendimento Mensal | Capital Final Mensal |");
-        Console.WriteLine("|--------------|----------------|----------------|--------------------|---------------------|");
-
-        for (int i = 0; i < capitais.Length; i++)
+        while (true)
         {
-            double capitalInicial = capitais[i];
-            double taxaJuros = taxas[i];
-            double capitalAtual = capitalInicial;
-            double totalRendimento = 0;
+            Console.WriteLine(" ---------------| Investe Fácil |--------------- ");
+            Console.WriteLine("\nDigite o Valor Presente Investido (ou 'sair' para encerrar):");
+            string entrada = Console.ReadLine();
+            if (entrada.ToLower() == "sair") break;
 
-            for (int mes = 1; mes <= meses; mes++)
+            if (double.TryParse(entrada, out double capital))
             {
-                // Cálculo do rendimento mensal
-                double rendimentoMensal = capitalAtual * taxaJuros;
-                capitalAtual += rendimentoMensal; // Atualiza o capital com o rendimento
-                totalRendimento += rendimentoMensal; // Acumula o rendimento total
-
-                // Exibindo os resultados mensais
-                Console.WriteLine($"| Investimento {i + 1} | {capitalAtual - rendimentoMensal,14:F2} | {taxaJuros * 100,12:F2}% | {rendimentoMensal,18:F2} | {capitalAtual,20:F2} |");
+                Console.WriteLine("Digite a Taxa de Juros:");
+                entrada = Console.ReadLine();
+                if (double.TryParse(entrada, out double taxa))
+                {
+                    investimentos.Add(new Investimento(capital, taxa, meses));
+                }
+                else
+                {
+                    Console.WriteLine("Taxa de juros inválida. Tente novamente.");
+                }
             }
+            else
+            {
+                Console.WriteLine("Valor investido inválido. Tente novamente.");
+            }
+        }
 
-            // Cálculo do rendimento para os 10 dias
-            double taxaDiaria = taxaJuros / 30; // Aproximando a taxa diária
-            double rendimentoDias = capitalAtual * taxaDiaria * dias;
-            capitalAtual += rendimentoDias; // Atualiza o capital com o rendimento dos 10 dias
-            totalRendimento += rendimentoDias; // Acumula o rendimento total
-
-            // Exibindo o resultado final
-            Console.WriteLine($"| Total Investimento {i + 1} | {capitalAtual - totalRendimento,14:F2} | {taxaJuros * 100,12:F2}% | {totalRendimento,18:F2} | {capitalAtual,20:F2} |");
-
-            Console.ReadLine();
+        Console.WriteLine("\nResultados dos Investimentos:");
+        foreach (var investimento in investimentos)
+        {
+            investimento.CalcularRendimentos(dias);
+        Console.ReadLine();
+        }
+    }
+}
