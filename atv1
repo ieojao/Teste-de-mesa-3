@@ -18,16 +18,37 @@ class Investimento
     {
         double capitalAtual = CapitalInicial;
         double totalRendimento = 0;
+        double saldoAtual = capitalAtual; // Usar o saldo atual em vez de float
         Console.WriteLine(" --------------- Tabela de investimentos --------------- ");
-        Console.WriteLine("\n| Mês | Capital Inicial | Rendimento Mensal | Capital Final |");
+        Console.WriteLine("\n| Mês | Capital Inicial | Rendimento Mensal | Capital Final | Resgate");
 
         for (int mes = 1; mes <= Meses; mes++)
         {
             double rendimentoMensal = capitalAtual * TaxaJuros; // Rendimento mensal
             capitalAtual += rendimentoMensal; // Atualiza o capital com o rendimento
+            double resgate = 0; // Resgate deve ser inicializado a cada mês
+            string resgatestr = "";
 
-            Console.WriteLine($"| {mes,3} | {capitalAtual - rendimentoMensal,14:F2} | {rendimentoMensal,18:F2} | {capitalAtual,14:F2} |");
+            if (mes == 5)
+            {
+                Console.WriteLine("Gostaria de fazer um saque no 5° mês? (s/n)");
+                string opcaoResgate = Console.ReadLine().ToLower();
+                if (opcaoResgate == "s" || opcaoResgate == "sim")
+                {
+                    Console.WriteLine("Digite o valor do resgate:");
+                    while (!double.TryParse(Console.ReadLine(), out resgate) || resgate > saldoAtual)
+                    {
+                        Console.WriteLine($"Por Favor, digite um valor válido menor ou igual a {saldoAtual:C2}: ");
+                    }
+                    saldoAtual -= resgate; // Atualiza o saldo após o resgate
+                    resgatestr = resgate.ToString("C2");
+                }
+            }
 
+            // Atualiza o capital após o resgate, se houver
+            capitalAtual -= resgate;
+
+            Console.WriteLine($"| {mes,3} | {CapitalInicial,14:F2} | {rendimentoMensal,18:F2} | {capitalAtual,14:F2} | {resgate,14:C2}");
             totalRendimento += rendimentoMensal;
         }
 
@@ -48,10 +69,9 @@ class Program
         List<Investimento> investimentos = new List<Investimento>();
         const int meses = 8; // Definido como 8 meses para todos os investimentos
         const int dias = 10; // Definido como 10 dias para todos os investimentos
-
+        Console.WriteLine("---------------------------| Investe Fácil |---------------------------");
         while (true)
         {
-            Console.WriteLine(" ---------------| Investe Fácil |--------------- ");
             Console.WriteLine("\nDigite o Valor Presente Investido (ou 'sair' para encerrar):");
             string entrada = Console.ReadLine();
             if (entrada.ToLower() == "sair") break;
@@ -60,6 +80,7 @@ class Program
             {
                 Console.WriteLine("Digite a Taxa de Juros:");
                 entrada = Console.ReadLine();
+                Console.WriteLine("------------------------------------------------------------ ");
                 if (double.TryParse(entrada, out double taxa))
                 {
                     investimentos.Add(new Investimento(capital, taxa, meses));
@@ -79,7 +100,8 @@ class Program
         foreach (var investimento in investimentos)
         {
             investimento.CalcularRendimentos(dias);
-        Console.ReadLine();
+            Console.ReadLine();
         }
     }
 }
+
